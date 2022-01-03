@@ -7,5 +7,10 @@ This is a simple cmake project.
 ## Build Instructions
 ```
 $ mkdir build
-$ cmake -B build/
+$ cmake -S . -B build/
+$ cd build
+$ make
+```
+```
+$ ./kash
 ```
