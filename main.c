@@ -186,7 +186,7 @@ int main_loop() {
     char **args;
     int status;
     do {
-        printf("kash$  ");
+        printf("kash$ ");
         line = line_reader();
         args = split_line(line);
         status = executer(args);
