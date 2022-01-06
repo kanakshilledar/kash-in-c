@@ -14,3 +14,5 @@ $ make
 ```
 $ ./kash
 ```
+## Screen Shots
+![kash shell running](https://user-images.githubusercontent.com/56501211/148338793-1d0ccf34-8f9d-4b40-9219-3573ba5a7042.png)
