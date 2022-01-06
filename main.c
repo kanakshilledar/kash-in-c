@@ -11,7 +11,7 @@ int help_cmd(char **args);
 int history_cmd(char **args);
 int exit_cmd(char **args);
 
-// List of builtin commands, followed by their corresponding functions.
+// list of builtin commands
 char *builtin_str[] = {
         "cd",
         "help",
@@ -19,6 +19,7 @@ char *builtin_str[] = {
         "exit",
 };
 
+// list of builtin command functions
 int (*builtin_func[]) (char **) = {
         &cd_cmd,
         &help_cmd,
@@ -26,12 +27,16 @@ int (*builtin_func[]) (char **) = {
         &exit_cmd,
 };
 
+// provides the number of builtin functions
 int num_builtins() {
     return sizeof(builtin_str) / sizeof(char *);
 }
 
 // builtin functions implementations
 
+// cd command
+// changes directory args[0] is "cd". args[1] is directory.
+// return 1 for continuous execution
 int cd_cmd(char **args) {
     if (args[1] == NULL)
         fprintf(stderr, "kash: expected argument to \"cd\"\n");
@@ -42,6 +47,9 @@ int cd_cmd(char **args) {
     return 1;
 }
 
+// help command
+// prints help message no arguments required
+// return 1 for continuous execution
 int help_cmd(char **args) {
     int i;
     printf("This is my personal implementation of a simple shell KASH\n");
@@ -55,18 +63,33 @@ int help_cmd(char **args) {
     return 1;
 }
 
+// history command
+// reads from the .history file and prints all the executed commands till now
+// requires no arguments returns 1 for continuous execution
 int history_cmd(char **args) {
-    // TODO: Add a history command
-    //    FILE history_file = fopen(".history", "a+");
+        FILE *history_file = fopen(".history", "r");
+        char c;
+        while (1) {
+            c = fgetc(history_file);
+            if (c != EOF) {
+                printf("%c", c);
+            } else
+                break;
+        }
+        fclose(history_file);
+        return 1;
 }
 
+// exit command
+// required to exit out of the shell
+// returns 0 for ending the execution
 int exit_cmd(char **args) {
     return 0;
 }
 
-
-
 // this function is used to launch a program and wait for its termination
+// null terminated list of arguments
+// returns 1 for continuous execution
 int launcher(char **args) {
     pid_t pid;
     int status;
@@ -88,9 +111,9 @@ int launcher(char **args) {
 }
 
 
-
 // execute shell built-in or launch program
-
+// null terminated list of arguments
+// returns 1 or 0 according to command
 int executer(char **args) {
     int i;
     if (args[0] == NULL) {
@@ -101,9 +124,12 @@ int executer(char **args) {
         if (strcmp(args[0], builtin_str[i]) == 0)
             return (*builtin_func[i])(args);
     }
+
     return launcher(args);
 }
 
+// read input line from stdin
+// return the same line
 char *line_reader(void) {
 #ifdef KASH_USE_STD_GETLINE
     char *lne = NULL;
@@ -161,6 +187,8 @@ char *line_reader(void) {
 #define KASH_TOK_DELIM " \t\r\n\a"
 
 // get tokens form the line
+// line as the argument
+// null terminated array of tokens
 char **split_line(char *line) {
     int bufsize = KASH_TOK_BUFSIZE, position = 0;
     char **tokens = malloc(bufsize * sizeof(char*));
@@ -193,6 +221,7 @@ char **split_line(char *line) {
     return tokens;
 }
 
+// loop for getting input and executing it
 int main_loop() {
     char *line;
     char **args;
@@ -202,12 +231,23 @@ int main_loop() {
         line = line_reader();
         args = split_line(line);
         status = executer(args);
+        // writing the commands to the .history file
+        FILE *history_file = fopen(".history", "a+");
+        if (history_file == NULL) {
+            printf("Error");
+            exit(1);
+        }
+        fputs(line, history_file);
+        // fputs doesnt have new line by default so a new line character is required
+        fputs("\n", history_file);
+        fclose(history_file);
 
         free(line);
         free(args);
     } while (status);
 }
 
+// main function
 int main(int argc, char **argv) {
     main_loop();
     return EXIT_SUCCESS;
