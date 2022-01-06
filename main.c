@@ -69,14 +69,19 @@ int help_cmd(char **args) {
 int history_cmd(char **args) {
         FILE *history_file = fopen(".history", "r");
         char c;
-        while (1) {
-            c = fgetc(history_file);
-            if (c != EOF) {
-                printf("%c", c);
-            } else
-                break;
+        if (history_file == NULL) {
+            FILE *create_history_file = fopen(".history", "a+");
+            fclose(create_history_file);
+        } else {
+            while (1) {
+                c = fgetc(history_file);
+                if (c != EOF) {
+                    printf("%c", c);
+                } else
+                    break;
+            }
+            fclose(history_file);
         }
-        fclose(history_file);
         return 1;
 }
 
