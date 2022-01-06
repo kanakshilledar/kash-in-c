@@ -67,21 +67,20 @@ int help_cmd(char **args) {
 // reads from the .history file and prints all the executed commands till now
 // requires no arguments returns 1 for continuous execution
 int history_cmd(char **args) {
-        FILE *history_file = fopen(".history", "r");
+        FILE *history_file = fopen(".history", "a+");
         char c;
-        if (history_file == NULL) {
-            FILE *create_history_file = fopen(".history", "a+");
-            fclose(create_history_file);
-        } else {
-            while (1) {
-                c = fgetc(history_file);
-                if (c != EOF) {
-                    printf("%c", c);
-                } else
-                    break;
-            }
-            fclose(history_file);
+//        if (history_file == NULL) {
+//            FILE *create_history_file = fopen(".history", "a+");
+//            freopen(create_history_file);
+//        }
+        while (1) {
+            c = fgetc(history_file);
+            if (c != EOF) {
+                printf("%c", c);
+            } else
+                break;
         }
+        fclose(history_file);
         return 1;
 }
 
